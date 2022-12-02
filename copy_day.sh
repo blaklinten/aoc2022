@@ -13,11 +13,9 @@ SOURCE_DIR="$PWD/../$DAY_TO_COPY"
 
 pushd "$SOURCE_DIR" >/dev/null || exit
 
-for item in src/ input.txt; do
+for item in Dockerfile src/ input.txt; do
     cp -r "$item" "$TARGET_DIR"
 done
  
 popd >/dev/null || exit
-
-find . -type f -exec sed -i -e s/$DAY_TO_COPY/$CURRENT_DAY/g '{}' \;
 
