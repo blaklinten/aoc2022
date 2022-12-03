@@ -130,10 +130,10 @@ part2()
 main()
 {
   if [ "$part" = "part1" ]; then
-    part1 "$@"
+    part1
   else
-    part2 "$@"
+    part2
   fi
 }
 
-main "$@"
+main
