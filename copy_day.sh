@@ -13,7 +13,7 @@ SOURCE_DIR="$PWD/../$DAY_TO_COPY"
 
 pushd "$SOURCE_DIR" >/dev/null || exit
 
-for item in Dockerfile src/ input.txt; do
+for item in Dockerfile *.sh input.txt; do
     cp -r "$item" "$TARGET_DIR"
 done
  
