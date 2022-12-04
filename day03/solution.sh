@@ -28,8 +28,10 @@ write_to_file()
   INPUT="$1"
   NAME="$2"
     while read -r -n1 char; do
-      echo "$char" >> "$NAME"
+      echo "$char" >> "${NAME}_UNSORTED"
     done <<<"$INPUT"
+    sort "${NAME}_UNSORTED" > "$NAME"
+    rm "${NAME}_UNSORTED"
 }
 
 part1()
@@ -38,24 +40,22 @@ part1()
     COMPARTMENT_SIZE=$(($(echo -n "$line" | wc -c) / 2))
 
     write_to_file "$(echo -n "$line" | cut -c $(seq -s, $COMPARTMENT_SIZE))" "FIRST_HALF"
-    sort FIRST_HALF > FIRST_HALF_SORTED
-    rm FIRST_HALF
-
     write_to_file "$(echo -n "$line" | cut -c $(seq -s, $COMPARTMENT_SIZE) --complement)" "SECOND_HALF"
-    sort SECOND_HALF > SECOND_HALF_SORTED
-    rm SECOND_HALF
 
-    comm -12 FIRST_HALF_SORTED SECOND_HALF_SORTED >> duplicates
+    comm -12 FIRST_HALF SECOND_HALF >> duplicates
   done <input.txt
 
   PRIORITY_POINTS=0
+
   while read -r char; do
     [ -z "$char" ] && continue
 
     ASCII_VALUE="$(get_ASCII_value "$char")"
     PRIORITY_POINTS=$((PRIORITY_POINTS + ASCII_VALUE))
   done <<<"$(uniq duplicates)"
+
   echo "$PRIORITY_POINTS"
+  rm -f {FIRST,SECOND}_HALF duplicates
 }
 
 part2()
@@ -63,25 +63,15 @@ part2()
   COUNT=1
   PRIORITY_POINTS=0
   while read -r line; do
-
     write_to_file "$line" "LINE$COUNT"
-    sort -u "LINE$COUNT" > "LINE${COUNT}_SORTED"
 
     if [ "$COUNT" = 3 ]; then
-      comm -12 LINE1_SORTED LINE2_SORTED > INTERMEDIATE_COMPARISON
-      GROUP_BADGE_TYPE="$(comm -12 INTERMEDIATE_COMPARISON LINE3_SORTED | tail -n1)"
-
+      comm -12 LINE1 LINE2 > INTERMEDIATE_COMPARISON
+      GROUP_BADGE_TYPE="$(comm -12 INTERMEDIATE_COMPARISON LINE3 | tail -n1)"
       ASCII_VALUE="$(get_ASCII_value "$GROUP_BADGE_TYPE")"
       PRIORITY_POINTS=$((PRIORITY_POINTS + ASCII_VALUE))
 
-      rm \
-        LINE1 \
-        LINE2 \
-        LINE3 \
-        LINE1_SORTED \
-        LINE2_SORTED \
-        LINE3_SORTED \
-        INTERMEDIATE_COMPARISON 
+      rm -f LINE{1,2,3}{_SORTED,} INTERMEDIATE_COMPARISON 
 
       COUNT=0
     fi
@@ -91,7 +81,7 @@ part2()
   echo "$PRIORITY_POINTS"
 }
 
-main()
+solve()
 {
   if [ "$part" = "part1" ]; then
     part1
@@ -100,20 +90,4 @@ main()
   fi
 }
 
-cleanup()
-{
-  rm -f \
-    FIRST_HALF_SORTED \
-    SECOND_HALF_SORTED \
-    duplicates \
-    LINE1 \
-    LINE2 \
-    LINE3 \
-    LINE1_SORTED \
-    LINE2_SORTED \
-    LINE3_SORTED \
-    INTERMEDIATE_COMPARISON 
-}
-
-main
-cleanup
+solve
