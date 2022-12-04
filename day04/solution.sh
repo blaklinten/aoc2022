@@ -27,6 +27,27 @@ part1()
   echo "$COUNT"
 }
 
+part2()
+{
+  COUNT=0
+
+  while read -r line; do
+    INTERVAL_1="$(cut -d',' -f1 <<<"$line")"
+    INTERVAL_2="$(cut -d',' -f2 <<<"$line")"
+
+    seq "${INTERVAL_1%-*}" "${INTERVAL_1#*-}" | sort > sequence1
+    seq "${INTERVAL_2%-*}" "${INTERVAL_2#*-}" | sort > sequence2
+
+    OVERLAP="$(comm -12 sequence1 sequence2)"
+
+    if [ -n "$OVERLAP" ]; then
+      COUNT=$((COUNT + 1))
+    fi
+  done <input.txt
+
+  echo "$COUNT"
+}
+
 main()
 {
   if [ "$part" = "part1" ]; then
