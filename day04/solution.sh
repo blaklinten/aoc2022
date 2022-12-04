@@ -66,7 +66,7 @@ main()
   else
     part2
   fi
-cleanup
+  cleanup
 }
 
 main
