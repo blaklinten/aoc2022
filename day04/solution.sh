@@ -5,21 +5,29 @@
   exit 1
 }
 
+write_sequences_to_files()
+{
+  SEQUENCE_PAIR="$1"
+
+  INTERVAL_1="$(cut -d',' -f1 <<<"$SEQUENCE_PAIR")"
+  INTERVAL_2="$(cut -d',' -f2 <<<"$SEQUENCE_PAIR")"
+
+  seq "${INTERVAL_1%-*}" "${INTERVAL_1#*-}" | sort > sequence1
+  seq "${INTERVAL_2%-*}" "${INTERVAL_2#*-}" | sort > sequence2
+}
+
 part1()
 {
   COUNT=0
 
   while read -r line; do
-    INTERVAL_1="$(cut -d',' -f1 <<<"$line")"
-    INTERVAL_2="$(cut -d',' -f2 <<<"$line")"
 
-    seq "${INTERVAL_1%-*}" "${INTERVAL_1#*-}" | sort > sequence1
-    seq "${INTERVAL_2%-*}" "${INTERVAL_2#*-}" | sort > sequence2
+    write_sequences_to_files "$line"
 
-    FIRST_IN_SECOND="$(comm -32 sequence1 sequence2)"
-    SECOND_IN_FIRST="$(comm -31 sequence1 sequence2)"
+    FIRST_NOT_IN_SECOND="$(comm -32 sequence1 sequence2)"
+    SECOND_NOT_IN_FIRST="$(comm -31 sequence1 sequence2)"
 
-    if [ -z "$FIRST_IN_SECOND" ] || [ -z "$SECOND_IN_FIRST" ]; then
+    if [ -z "$FIRST_NOT_IN_SECOND" ] || [ -z "$SECOND_NOT_IN_FIRST" ]; then
       COUNT=$((COUNT + 1))
     fi
   done <input.txt
@@ -32,11 +40,8 @@ part2()
   COUNT=0
 
   while read -r line; do
-    INTERVAL_1="$(cut -d',' -f1 <<<"$line")"
-    INTERVAL_2="$(cut -d',' -f2 <<<"$line")"
 
-    seq "${INTERVAL_1%-*}" "${INTERVAL_1#*-}" | sort > sequence1
-    seq "${INTERVAL_2%-*}" "${INTERVAL_2#*-}" | sort > sequence2
+    write_sequences_to_files "$line"
 
     OVERLAP="$(comm -12 sequence1 sequence2)"
 
