@@ -1,7 +1,7 @@
 #!/bin/bash
 
 [ -z "$part" ] &&  {
-  echo "Pleas specify which part to solve with the env. var. \$part"
+  echo "Please specify which part to solve with the env. var. \$part"
   exit 1
 }
 
