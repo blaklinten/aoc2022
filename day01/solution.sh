@@ -29,31 +29,15 @@ sum()
   echo "$sum"
 }
 
-part1()
+solve()
 {
   calculate_elf_calories
-  sort -n calories | tail -n1
-}
-
-part2()
-{
-  calculate_elf_calories
-  sort -n calories | tail -n3 | sum
-}
-
-main()
-{
   if [ "$part" = "part1" ]; then
-    part1 
+    sort -n calories | tail -n1
   else
-    part2
+    sort -n calories | tail -n3 | sum
   fi
-}
-
-cleanup()
-{
   rm -f calories
 }
 
-main 
-cleanup
+solve

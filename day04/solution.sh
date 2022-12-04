@@ -34,6 +34,7 @@ solve()
   done <input.txt
 
   echo "$COUNT"
+  rm sequence{1,2}
 }
 
 solve
