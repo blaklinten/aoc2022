@@ -53,6 +53,12 @@ part2()
   echo "$COUNT"
 }
 
+cleanup()
+{
+  rm -f \
+    sequence{1,2}
+}
+
 main()
 {
   if [ "$part" = "part1" ]; then
@@ -60,13 +66,7 @@ main()
   else
     part2
   fi
-}
-
-cleanup()
-{
-  rm -f \
-    sequence{1,2}
+cleanup
 }
 
 main
-cleanup
