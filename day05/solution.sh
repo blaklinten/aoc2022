@@ -30,25 +30,32 @@ stack_them_boxes()
   done<<<"$STACKS"
 }
 
-perform_instruction()
+perform_instructions()
 {
   INSTRUCTIONS="$1"
-  LOOP=$(cut -d' ' -f2 <<<"$INSTRUCTIONS")
+
+  if [ "$part" = "part1" ]; then
+    LOOP=$(cut -d' ' -f2 <<<"$INSTRUCTIONS")
+    NUMBER_OF_CRATES_TO_MOVE=1
+  else
+    LOOP=1
+    NUMBER_OF_CRATES_TO_MOVE=$(cut -d' ' -f2 <<<"$INSTRUCTIONS")
+  fi
+
   SOURCE_STACK=$(cut -d' ' -f4 <<<"$INSTRUCTIONS")
   DEST_STACK=$(cut -d' ' -f6 <<<"$INSTRUCTIONS")
 
   COUNT=0
   while [ "$COUNT" -lt "$LOOP" ]; do
     COUNT=$((COUNT + 1))
-    CONTENT_TO_MOVE=$(sed -n 1p stack"$SOURCE_STACK")
 
     # Push
-    printf '%s\n' "$CONTENT_TO_MOVE" > content
+    sed -n 1,"$NUMBER_OF_CRATES_TO_MOVE"p stack"$SOURCE_STACK" > content
     cat content "stack$DEST_STACK" > dest_file
     mv dest_file "stack$DEST_STACK"
 
     # Pop
-    sed -n 2,\$p "stack$SOURCE_STACK" >> source_file
+    sed -n "$((NUMBER_OF_CRATES_TO_MOVE + 1))",\$p "stack$SOURCE_STACK" >> source_file
     mv source_file "stack$SOURCE_STACK"
   done
 }
@@ -58,6 +65,7 @@ print_top_crates()
   for stack in stack*; do
     head -n1 "$stack" | tr -d '[:cntrl:]'
   done
+  echo
 }
 
 solve()
@@ -66,7 +74,7 @@ solve()
     if [ -z "$line" ] || [ "${line:0:3}" = " 1 " ] ; then # Empty line or stack number, ignore
       continue
     elif [ "${line:0:4}" = "move" ]; then # instructions
-      perform_instruction "$line"
+      perform_instructions "$line"
     else # A stack line
       stack_them_boxes "$line"
     fi
