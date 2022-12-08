@@ -78,7 +78,7 @@ solve()
     else # A stack line
       stack_them_boxes "$line"
     fi
-    done<"input.txt"
+  done<"input.txt"
 
     print_top_crates
     rm -f stack* content
