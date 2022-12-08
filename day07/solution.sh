@@ -51,6 +51,27 @@ find_sum_of_dirs_less_than_100000()
   echo "$TOTAL"
 }
 
+free_up_just_enough_space()
+{
+  DISK_SIZE="70000000"
+  SPACE_NEEDED="30000000"
+  CURRENTLY_USED_SPACE_AT_ROOT="$(sort -n "$TMP_SUM" | tail -n1 )"
+  CURRENTLY_USED_SPACE="$(cut -d',' -f1 <<<"$CURRENTLY_USED_SPACE_AT_ROOT")"
+  CURRENTLY_FREE_SPACE="$((DISK_SIZE - CURRENTLY_USED_SPACE))"
+  SPACE_DIFF="$((SPACE_NEEDED - CURRENTLY_FREE_SPACE))"
+
+  while read -r size_and_dir; do
+    local SIZE
+    SIZE="$(cut -d',' -f1 <<<"$size_and_dir")"
+    if [ "$SIZE" -lt "$SPACE_DIFF" ]; then
+      continue
+    else
+      echo "$SIZE"
+      return
+    fi
+  done < <(sort -n "$TMP_SUM")
+}
+
 solve()
 {
   mkdir "$WD"
@@ -71,6 +92,13 @@ solve()
 
   calculate_dir_sizes
 
+  if [ "$part" = "part1" ]; then
+    find_sum_of_dirs_less_than_100000
+  else
+    free_up_just_enough_space
+  fi
+
+  rm -r "$TMP_SUM" "$WD"
 }
 
 solve
