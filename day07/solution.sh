@@ -6,7 +6,7 @@
 }
 
 ROOT="$PWD"
-WD="$ROOT/aoc-base-dir"
+WD="$ROOT/day07-base-dir"
 TMP_SUM="$ROOT/sum"
 
 aoc_cd()
@@ -19,13 +19,6 @@ aoc_cd()
   fi
 }
 
-aoc_mkdir()
-{
-  DIR_NAME="$1"
-  mkdir "$DIR_NAME"
-  touch "$DIR_NAME/dir_size"
-}
-
 sum()
 {
   sum=0
@@ -33,14 +26,6 @@ sum()
     sum=$((sum + size))
   done
   printf '%s' "$sum"
-}
-
-create_file_with_size()
-{
-  local FILE_NAME="$1"
-  local FILE_SIZE"$2"
-
-  echo "$FILE_SIZE" > "$FILE_NAME"
 }
 
 calculate_dir_sizes()
@@ -54,7 +39,7 @@ calculate_dir_sizes()
   done < <(find . -type d)
 }
 
-find_sum_of_dir_less_than_100000()
+find_sum_of_dirs_less_than_100000()
 {
   TOTAL=0
   while read -r line; do
@@ -62,7 +47,7 @@ find_sum_of_dir_less_than_100000()
     if [ "$SIZE" -lt 100000 ]; then
       TOTAL=$((TOTAL + SIZE))
     fi
-  done <<<"$( sort -n "$TMP_SUM")"
+  done <<<"$(sort -n "$TMP_SUM")"
   echo "$TOTAL"
 }
 
@@ -76,17 +61,16 @@ solve()
     elif [ "${line:0:4}" = "$ ls" ] ; then # cd, try to execute
       continue
     elif [ "${line:0:3}" = "dir" ]; then # Directory is found, create it
-      aoc_mkdir "${line:4}"
+      mkdir "${line:4}"
     else # File is found, create it
       FILE_NAME="$(cut -d' ' -f2 <<<"$line")"
       FILE_SIZE="$(cut -d' ' -f1 <<<"$line")" 
-      create_file_with_size "$FILE_NAME" "$FILE_SIZE"
+      echo "$FILE_SIZE" > "$FILE_NAME"
     fi
   done<"input.txt"
 
   calculate_dir_sizes
 
-  find_sum_of_dir_less_than_100000
 }
 
 solve
